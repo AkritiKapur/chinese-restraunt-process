@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 alpha = 0.5  # Concentration parameter
-colors = ['green', 'red', 'blue', 'black', 'orange', 'pink', 'yellow', 'purple']
+colors = ['green', 'red', 'blue', 'orange', 'pink', 'brown']
 
 
 def assign_new_table(n):
@@ -79,17 +79,37 @@ def generative_model(tot_cus):
 
             # Add dish distribution to table
             table_params.append((x, y))
+        else:
+            table_cus_map[table_chosen] += 1
 
         # Draw sample dishes from chosen table's dish distribution
         color = colors[table_chosen]
         mean = [table_params[table_chosen][0], table_params[table_chosen][1]]
-        covariance = [[0.1, 0], [0, 0.1]]
+        covariance = [[0.1, 0.01], [0.01, 0.1]]
         x, y = np.random.multivariate_normal(mean, covariance)
         samples.append([x, y, color])
 
     return samples
 
 
+def format_samples(samples):
+    samples = np.array(samples)
+    x = samples[:, 0]
+    y = samples[:, 1]
+    c = samples[:, 2]
+
+    return {'x': x, 'y': y, 'color': c}
+
+
+def plot_crp_distribution(samples):
+    params = format_samples(samples)
+    c = params['color'].tolist()
+    plt.scatter(params['x'], params['y'], c=c,  marker='o')
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
+
 if __name__ == '__main__':
-    plot_assignments(500)
-    samples = generative_model(10)
+    # plot_assignments(500)
+    samples = generative_model(500)
+    plot_crp_distribution(samples)
