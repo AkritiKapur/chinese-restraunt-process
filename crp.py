@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 alpha = 0.5  # Concentration parameter
-colors = ['green', 'red', 'blue', 'orange', 'pink', 'brown']
+colors = ['green', 'red', 'blue', 'orange', 'pink', 'brown', 'yellow', 'cyan']
 
 
 def assign_new_table(n):
@@ -83,33 +83,42 @@ def generative_model(tot_cus):
             table_cus_map[table_chosen] += 1
 
         # Draw sample dishes from chosen table's dish distribution
-        color = colors[table_chosen]
         mean = [table_params[table_chosen][0], table_params[table_chosen][1]]
-        covariance = [[0.1, 0.01], [0.01, 0.1]]
+        covariance = [[0.01, 0], [0, 0.01]]
         x, y = np.random.multivariate_normal(mean, covariance)
-        samples.append([x, y, color])
+        samples.append([x, y, table_chosen])
 
     return samples
 
 
 def format_samples(samples):
+    """
+        Formats sample list into matplotlib parameters
+    :param samples: samples that need to be formatted
+    :return: {Dict} matplotlib friendly parameters
+    """
     samples = np.array(samples)
     x = samples[:, 0]
     y = samples[:, 1]
-    c = samples[:, 2]
+    c = samples[:, 2].tolist()
+    c = [colors[int(i)] for i in c]
 
     return {'x': x, 'y': y, 'color': c}
 
 
 def plot_crp_distribution(samples):
+    """
+        Plots CRP distribution as a scatter plot
+    :param samples: Samples that need to be plotted
+    :return: None
+    """
     params = format_samples(samples)
-    c = params['color'].tolist()
-    plt.scatter(params['x'], params['y'], c=c,  marker='o')
+    plt.scatter(params['x'], params['y'], c=params['color'],  marker='o')
     plt.xticks([])
     plt.yticks([])
     plt.show()
 
 if __name__ == '__main__':
-    # plot_assignments(500)
+    plot_assignments(500)
     samples = generative_model(500)
     plot_crp_distribution(samples)
